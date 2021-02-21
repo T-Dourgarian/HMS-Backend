@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const listingSchema = new Schema({
-    symbol: String,
-    balanceUSD: Number,
-    balanceBTC: Number, 
-    priceUSD: Number,
-    priceBTC: Number
+	uuid: String,
+    date: Date,
+	roomUuid: String,
+	booked: Boolean,
+	price: Number
 });
 
 

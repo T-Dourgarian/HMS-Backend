@@ -7,8 +7,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 require('dotenv').config();
 
+// scripts
+const createListings = require('./scripts/listings');
 
-// Route includes
 
 // Body parser middleware
 app.use(bodyParser.json());
@@ -16,17 +17,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors())
 
 
+
+
 // router imports
 const listingRouter = require('./routes/listing.router');
-// const indicatorRouter = require('./routes/indicator.router');
-// const userRouter = require('./routes/user.router');
+const roomRouter = require('./routes/room.router');
+const addOnRouter = require('./routes/addOn.router');
 
 
 
 /* Routes */
 app.use('/api/listing', listingRouter);
-// app.use('/api/indicator', indicatorRouter);
-// app.use('/api/user', userRouter);
+app.use('/api/room', roomRouter);
+app.use('/api/addon', addOnRouter);
+
 app.get('/public',(req,res) => {
 	res.sendStatus(200);
 })
@@ -47,7 +51,7 @@ const dbConnect = async () => {
 		  useUnifiedTopology: true
 		};
 	  
-		// await mongoose.connect(`mongodb://thomas123:${process.env.DB_PASSWORD}@binancebotdb-shard-00-00.rntaw.mongodb.net:27017,binancebotdb-shard-00-01.rntaw.mongodb.net:27017,binancebotdb-shard-00-02.rntaw.mongodb.net:27017/binanceBot?replicaSet=atlas-tbrsua-shard-0&ssl=true&authSource=admin`, connOptions);
+		await mongoose.connect(process.env.MongoConnection, connOptions);
 	
 		console.log('DB connected')
 		
@@ -61,5 +65,7 @@ const dbConnect = async () => {
 app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
   
+  createListings.start();
+
   dbConnect();
 });
