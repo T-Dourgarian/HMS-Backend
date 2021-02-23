@@ -12,8 +12,6 @@ const listingDB = require('../models/listing.model')
 module.exports = new CronJob('0 0 0 * * *', async function() {
 	try {
 
-		console.log('here')
-
 		const rooms = await roomDB.find({});
 
 		const [latestListing] = await listingDB.find().sort({"date": -1}).limit(1);
@@ -32,6 +30,8 @@ module.exports = new CronJob('0 0 0 * * *', async function() {
 			});
 				price+= 20
 		}
+
+		console.log('New Listings Created')
 
 	} catch(error) {
 		console.log(error)
