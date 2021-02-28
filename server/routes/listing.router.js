@@ -19,17 +19,17 @@ router.get('/', async (req,res) => {
 			[
 				{
 					$match: {
-						$and: [ {date: { $gte: new Date(checkIn) }}, { date: { $lte: new Date(checkOut) }}]
+						$and: [ {date: { $gte: new Date(checkIn) }}, { date: { $lt: new Date(checkOut) }}]
 					}
 				},
 				{
 					$group: { 
 						_id: { roomUuid :'$roomUuid' }, 
 						checkIn: { $min: '$date' }, 
-						checkOut: { $max: '$date' }, 
 						totalPrice: { $sum: '$price' },
 						allDates: { $push:  '$date' },
 						listingUuids: { $push:  '$uuid' },
+						numberOfNights: { $sum: 1 } 
 					}
 				},
 				{
@@ -40,8 +40,15 @@ router.get('/', async (req,res) => {
 						as: 'room'
 					}
 				},
+				{ 
+					$sort : { 
+						totalPrice : 1 
+					} 
+				},
 			]
 		);
+
+
 
 
 		res.status(200).json(listings)

@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const axios = require("axios");
+const moment = require('moment');
 const uuid = require('uuid');
 
 
 // Import DBs
 const roomDB = require('../models/room.model');
 const addOnDb = require('../models/addOn.model');
+const listingDb = require('../models/listing.model');
 
 
 
@@ -14,17 +16,42 @@ const addOnDb = require('../models/addOn.model');
 router.post('/create', async(req,res) => {
     try {
 
-		const { name, subtitle, description, addOns } = req.body;
+		const { name, subtitle, description, addOns, basePrice } = req.body;
 
 		console.log('in create room');
+
+		const newRoomUuid = uuid.v1();
 		
 		await roomDB.create({
-			uuid: uuid.v1(),
+			uuid: newRoomUuid,
 			name,
 			subtitle,
 			description,
+			basePrice,
 			addOns,
 		});
+
+
+		// creating 6 months of listing documents for new room
+		const currentMoment = moment();
+		const endMoment = moment().add(6, 'months');
+
+		let newListings = [];
+
+		while (currentMoment.isBefore(endMoment, 'day')) {
+			
+			newListings.push({
+				date: new Date(currentMoment),
+				roomUuid: newRoomUuid,
+				booked: false,
+				price: basePrice
+			});
+
+			currentMoment.add(1, 'days');
+		}
+
+
+		await listingDb.insertMany(newListings);
 		
 		res.sendStatus(200);
 
@@ -74,5 +101,22 @@ router.put('/update/:uuid', async(req,res) => {
         res.sendStatus(400);
     }
 });
+
+router.delete('/delete/:uuid', async(req,res) => {
+    try {
+		const { uuid } = req.params;
+		
+		await listingDb.deleteMany({ roomUuid: uuid, booked: false });
+
+		await roomDB.deleteOne({ uuid });
+
+		res.sendStatus(200);
+
+    }catch(error) {
+        console.log(error)
+        res.sendStatus(400);
+    }
+});
+
 
 module.exports = router;

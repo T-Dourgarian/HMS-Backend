@@ -1,13 +1,15 @@
 const mongoose = require('mongoose');
+const uuid = require('uuid');
 
 const { Schema } = mongoose;
 
 const roomSchema = new Schema({
-    uuid: String,
+    uuid: { type: String, default: uuid.v1()},
     name: String,
     subtitle: String, 
 	description: String,
-	addOns: [String]
+	basePrice: Number,
+	addOns: [Object]
 });
 
 

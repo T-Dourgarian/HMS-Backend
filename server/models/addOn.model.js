@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
+const uuid = require('uuid');
 
 const { Schema } = mongoose;
 
 const addOnSchema = new Schema({
-	uuid: String,
+	uuid: { type: String, default: uuid.v1()},
 	name: String,
     cost: Number,
 });
