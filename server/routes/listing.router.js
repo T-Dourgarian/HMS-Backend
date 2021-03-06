@@ -19,7 +19,7 @@ router.get('/', async (req,res) => {
 			[
 				{
 					$match: {
-						$and: [ {date: { $gte: new Date(checkIn) }}, { date: { $lt: new Date(checkOut) }}]
+						$and: [ {date: { $gte: new Date(checkIn) }}, { date: { $lt: new Date(checkOut) }} , { booked : false }],
 					}
 				},
 				{
@@ -47,8 +47,6 @@ router.get('/', async (req,res) => {
 				},
 			]
 		);
-
-
 
 
 		res.status(200).json(listings)

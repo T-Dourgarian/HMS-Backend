@@ -23,6 +23,7 @@ app.use(cors())
 const listingRouter = require('./routes/listing.router');
 const roomRouter = require('./routes/room.router');
 const addOnRouter = require('./routes/addOn.router');
+const bookingRouter = require('./routes/booking.router');
 
 
 
@@ -30,6 +31,7 @@ const addOnRouter = require('./routes/addOn.router');
 app.use('/api/listing', listingRouter);
 app.use('/api/room', roomRouter);
 app.use('/api/addon', addOnRouter);
+app.use('/api/booking', bookingRouter);
 
 app.get('/public',(req,res) => {
 	res.sendStatus(200);

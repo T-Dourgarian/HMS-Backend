@@ -41,6 +41,7 @@ router.post('/create', async(req,res) => {
 		while (currentMoment.isBefore(endMoment, 'day')) {
 			
 			newListings.push({
+				uuid: uuid.v1(),
 				date: new Date(currentMoment),
 				roomUuid: newRoomUuid,
 				booked: false,
