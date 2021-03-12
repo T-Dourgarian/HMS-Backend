@@ -17,7 +17,7 @@ const bookingSchema = new Schema({
 	customerDetails: {
 		name: { default: null, type: String },
 		email: { default: null, type: String },
-		phoneNumber: { default: null, type: Number },
+		phoneNumber: { default: null, type: String },
 	}
 });
 

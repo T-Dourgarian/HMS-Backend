@@ -80,17 +80,16 @@ router.post('/create', async(req,res) => {
     }
 });
 
-router.get('/', async(req,res) => {
+router.get('/', async (req, res) => {
     try {
 
 		console.log('in get bookings');
 		
-		const rooms = await roomDB.find({});
+		const bookings = await bookingDb.find({});
 
-		const addOns = await addOnDb.find({});
-
+		console.log(bookings[0])
 		
-		res.status(200).json({ rooms, addOns });
+		res.status(200).json({ bookings });
 
     }catch(error) {
         console.log(error)

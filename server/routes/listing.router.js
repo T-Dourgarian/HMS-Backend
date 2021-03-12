@@ -14,17 +14,25 @@ router.get('/', async (req,res) => {
     try {
 
 		const { checkIn, checkOut } = req.query;
+
+		const bookedListings = await listingDB.aggregate([
+			{
+				$match: {
+					$and: [ {date: { $gte: new Date(checkIn) }}, { date: { $lt: new Date(checkOut) }} , { booked : true }],
+				}
+			},
+		]);
 		
-		const listings = await listingDB.aggregate(
+		let listings = await listingDB.aggregate(
 			[
 				{
 					$match: {
-						$and: [ {date: { $gte: new Date(checkIn) }}, { date: { $lt: new Date(checkOut) }} , { booked : false }],
+						$and: [ {date: { $gte: new Date(checkIn) }}, { date: { $lt: new Date(checkOut) }}],
 					}
 				},
 				{
 					$group: { 
-						_id: { roomUuid :'$roomUuid' }, 
+						_id: '$roomUuid',
 						checkIn: { $min: '$date' }, 
 						totalPrice: { $sum: '$price' },
 						allDates: { $push:  '$date' },
@@ -35,7 +43,7 @@ router.get('/', async (req,res) => {
 				{
 					$lookup : {
 						from: 'rooms',
-						localField: '_id.roomUuid',
+						localField: '_id',
 						foreignField: 'uuid',
 						as: 'room'
 					}
@@ -47,6 +55,25 @@ router.get('/', async (req,res) => {
 				},
 			]
 		);
+
+
+
+		// remove all listings for room if any one listing is already booked.
+
+		listings = listings.filter(listing => {
+
+
+			for (listingUuid of listing.listingUuids) {
+				console.log(listingUuid)
+				for(bookedListing of bookedListings) {
+					if (listingUuid == bookedListing.uuid){
+						return false;
+					}
+				}
+			}
+
+			return true;
+		})
 
 
 		res.status(200).json(listings)
