@@ -18,7 +18,8 @@ const bookingSchema = new Schema({
 		name: { default: null, type: String },
 		email: { default: null, type: String },
 		phoneNumber: { default: null, type: String },
-	}
+	},
+	color: { default: '#FF5733', type: String}
 });
 
 

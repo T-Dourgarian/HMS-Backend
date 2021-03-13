@@ -11,25 +11,8 @@ const addOnDb = require('../models/addOn.model');
 const listingDb = require('../models/listing.model');
 const bookingDb = require('../models/booking.model');
 
-
-// const bookingSchema = new Schema({
-// 	uuid: { type: String, default: uuid.v1() },
-// 	roomUuid: { default: null, type: String },
-//     checkIn: { default: null, type: Date },
-// 	checkOut: { default: null, type: Date },
-// 	numberOfNights: { default: null, type: Number },
-// 	listingsBooked: { default: null, type: [String] },
-// 	roomPrice: { default: null, type: Number },
-// 	addOnPrice: { default: null, type: Number },
-// 	totalPrice: { default: null, type: Number },
-// 	numberOfGuests: { default: null, type: Number },
-// 	customerDetails: {
-// 		name: { default: null, type: String },
-// 		email: { default: null, type: String },
-// 		phoneNumber: { default: null, type: Number },
-// 	}
-// });
-
+// colors for calendar bookings
+const colors = ['#407294','#5ac18e','#008080','#ffa500','#ff7373','#fa8072','#20b2aa','#468499','#6897bb','#66cdaa']
 
 router.post('/create', async(req,res) => {
     try {
@@ -63,7 +46,12 @@ router.post('/create', async(req,res) => {
 			addOnPrice,
 			totalPrice,
 			numberOfGuests,
-			customerDetails
+			customerDetails : {
+				name:'Thomas Dourgarian',
+				email: 'ThomasDourgarian@gmail.com',
+				phoneNumber: '651-262-9188'
+			},
+			color: colors[Math.floor(Math.random() * colors.length - 1)]
 		});
 
 		console.log('create successful')
@@ -85,7 +73,16 @@ router.get('/', async (req, res) => {
 
 		console.log('in get bookings');
 		
-		const bookings = await bookingDb.find({});
+		const bookings = await bookingDb.aggregate([
+			{
+				$lookup : {
+					from: 'rooms',
+					localField: 'roomUuid',
+					foreignField: 'uuid',
+					as: 'room'
+				}
+			}
+		]);
 
 		console.log(bookings[0])
 		
