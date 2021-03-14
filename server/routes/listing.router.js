@@ -13,6 +13,7 @@ const roomDB = require('../models/room.model');
 router.get('/', async (req,res) => {
     try {
 
+
 		const { checkIn, checkOut } = req.query;
 
 		const bookedListings = await listingDB.aggregate([

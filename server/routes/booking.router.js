@@ -46,11 +46,7 @@ router.post('/create', async(req,res) => {
 			addOnPrice,
 			totalPrice,
 			numberOfGuests,
-			customerDetails : {
-				name:'Thomas Dourgarian',
-				email: 'ThomasDourgarian@gmail.com',
-				phoneNumber: '651-262-9188'
-			},
+			customerDetails,
 			color: colors[Math.floor(Math.random() * colors.length - 1)]
 		});
 
