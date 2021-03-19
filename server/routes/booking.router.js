@@ -21,7 +21,6 @@ router.post('/create', async(req,res) => {
 			roomUuid,
 			checkIn,
 			checkOut,
-			lastNight,
 			numberOfNights,
 			listingsBooked,
 			roomPrice,
@@ -33,13 +32,10 @@ router.post('/create', async(req,res) => {
 
 		console.log( req.body)
 
-		console.log('in booking')
-
 		await bookingDb.create({
 			roomUuid,
 			checkIn,
 			checkOut,
-			lastNight,
 			numberOfNights,
 			listingsBooked,
 			roomPrice,
@@ -51,10 +47,6 @@ router.post('/create', async(req,res) => {
 		});
 
 		console.log('create successful')
-
-		await listingDb.updateMany({ uuid: { $in : listingsBooked } }, { booked: true })
-
-		console.log('update successful')
 		
 		res.sendStatus(200);
 
@@ -64,11 +56,10 @@ router.post('/create', async(req,res) => {
     }
 });
 
+
+
 router.get('/', async (req, res) => {
     try {
-
-		console.log('in get bookings');
-		
 		const bookings = await bookingDb.aggregate([
 			{
 				$lookup : {

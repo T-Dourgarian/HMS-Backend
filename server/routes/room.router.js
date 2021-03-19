@@ -9,6 +9,7 @@ const uuid = require('uuid');
 const roomDB = require('../models/room.model');
 const addOnDb = require('../models/addOn.model');
 const listingDb = require('../models/listing.model');
+const bookingDb = require('../models/booking.model');
 
 
 
@@ -73,6 +74,61 @@ router.get('/', async(req,res) => {
 
 		
 		res.status(200).json({ rooms, addOns });
+
+    }catch(error) {
+        console.log(error)
+        res.sendStatus(400);
+    }
+});
+
+
+router.get('/listings', async (req, res) => { // returns all rooms that are not already booked between the checkin and out dates
+    try {
+
+		const { checkIn, checkOut } = req.query;
+
+		console.log('in get listings');
+
+		const bookings = await bookingDb.aggregate([
+			{ 
+				$match: {
+					$or: [
+						{
+							checkIn: {
+								$gte: new Date(checkIn) ,
+								$lt: new Date(checkOut) 
+							}
+						},
+						{
+							checkOut: {
+								$gte: new Date(checkIn) ,
+								$lt: new Date(checkOut) 
+							}
+						},
+					]
+				} 
+			},
+			{
+				$project: {
+					roomUuid: 1
+				}
+			}
+		]);
+
+		const rooms = await roomDB.find({});
+		
+		let listings = rooms.filter(room => {
+			for (booking of bookings) {
+				if (booking.roomUuid == room.uuid) {
+					return false;
+				}
+			}
+			return true;
+		});
+
+		console.log(listings)
+
+		res.status(200).json(listings);
 
     }catch(error) {
         console.log(error)
