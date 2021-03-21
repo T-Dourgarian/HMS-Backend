@@ -19,6 +19,7 @@ router.post('/create', async(req,res) => {
 
 		const { 
 			roomUuid,
+			addOns,
 			checkIn,
 			checkOut,
 			numberOfNights,
@@ -34,6 +35,7 @@ router.post('/create', async(req,res) => {
 
 		await bookingDb.create({
 			roomUuid,
+			addOns,
 			checkIn,
 			checkOut,
 			numberOfNights,

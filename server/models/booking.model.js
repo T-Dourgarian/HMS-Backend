@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 
 const bookingSchema = new Schema({
 	uuid: { type: String, default: uuid.v1() },
+	addOns: { default: [], type: Array },
 	roomUuid: { default: null, type: String },
     checkIn: { default: null, type: Date },
 	checkOut: { default: null, type: Date },
