@@ -47,8 +47,6 @@ router.post('/create', async(req,res) => {
 			customerDetails,
 			color: colors[Math.floor(Math.random() * colors.length - 1)]
 		});
-
-		console.log('create successful')
 		
 		res.sendStatus(200);
 
@@ -64,6 +62,11 @@ router.get('/', async (req, res) => {
     try {
 		const bookings = await bookingDb.aggregate([
 			{
+				$match: {
+					canceled: false
+				}
+			},
+			{
 				$lookup : {
 					from: 'rooms',
 					localField: 'roomUuid',
@@ -72,8 +75,6 @@ router.get('/', async (req, res) => {
 				}
 			}
 		]);
-
-		console.log(bookings[0])
 		
 		res.status(200).json({ bookings });
 
@@ -96,11 +97,13 @@ router.put('/update/:uuid', async(req,res) => {
     }
 });
 
-router.delete('/delete/:uuid', async(req,res) => {
+router.delete('/cancel/:uuid', async(req,res) => {
     try {
+		const { uuid } = req.params;
+
+		await bookingDb.updateOne({ uuid: uuid }, { canceled: true })
 
 		res.sendStatus(200);
-
     }catch(error) {
         console.log(error)
         res.sendStatus(400);

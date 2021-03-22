@@ -20,7 +20,8 @@ const bookingSchema = new Schema({
 		email: { default: null, type: String },
 		phoneNumber: { default: null, type: String },
 	},
-	color: { default: '#FF5733', type: String}
+	color: { default: '#FF5733', type: String},
+	canceled: {default: false, type: Boolean }
 });
 
 
