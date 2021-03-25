@@ -24,6 +24,7 @@ const listingRouter = require('./routes/listing.router');
 const roomRouter = require('./routes/room.router');
 const addOnRouter = require('./routes/addOn.router');
 const bookingRouter = require('./routes/booking.router');
+const amenityRouter = require('./routes/amenity.router');
 
 
 
@@ -32,6 +33,7 @@ app.use('/api/listing', listingRouter);
 app.use('/api/room', roomRouter);
 app.use('/api/addon', addOnRouter);
 app.use('/api/booking', bookingRouter);
+app.use('/api/amenity', amenityRouter);
 
 app.get('/public',(req,res) => {
 	res.sendStatus(200);
