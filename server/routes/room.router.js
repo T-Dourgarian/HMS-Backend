@@ -9,6 +9,7 @@ const uuid = require('uuid');
 const roomDB = require('../models/room.model');
 const addOnDb = require('../models/addOn.model');
 const bookingDb = require('../models/booking.model');
+const amenityDB = require('../models/amenity.model');
 
 
 
@@ -16,7 +17,7 @@ const bookingDb = require('../models/booking.model');
 router.post('/create', async(req,res) => {
     try {
 
-		const { name, subtitle, description, addOns, basePrice } = req.body;
+		const { name, subtitle, description, addOns, basePrice, amenities } = req.body;
 
 		console.log('in create room');
 
@@ -29,6 +30,7 @@ router.post('/create', async(req,res) => {
 			description,
 			basePrice,
 			addOns,
+			amenities,
 		});
 		
 		res.sendStatus(200);
@@ -48,8 +50,10 @@ router.get('/', async(req,res) => {
 
 		const addOns = await addOnDb.find({});
 
+		const amenities = await amenityDB.find({});
+
 		
-		res.status(200).json({ rooms, addOns });
+		res.status(200).json({ rooms, addOns, amenities });
 
     }catch(error) {
         console.log(error)
@@ -115,7 +119,7 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 router.put('/update/:uuid', async(req,res) => {
     try {
 
-		const { name, subtitle, description, addOns } = req.body;
+		const { name, subtitle, description, addOns, amenities } = req.body;
 		const { uuid } = req.params;
 
 		console.log('in update room');
@@ -125,6 +129,7 @@ router.put('/update/:uuid', async(req,res) => {
 			subtitle,
 			description,
 			addOns,
+			amenities
 		});
 		
 		res.sendStatus(200);
