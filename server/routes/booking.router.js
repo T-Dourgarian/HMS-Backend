@@ -8,7 +8,6 @@ const uuid = require('uuid');
 // Import DBs
 const roomDB = require('../models/room.model');
 const addOnDb = require('../models/addOn.model');
-const listingDb = require('../models/listing.model');
 const bookingDb = require('../models/booking.model');
 
 // colors for calendar bookings

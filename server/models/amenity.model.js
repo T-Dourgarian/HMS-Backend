@@ -6,11 +6,11 @@ const { Schema } = mongoose;
 const amenitySchema = new Schema({
 	uuid: { type: String, default: uuid.v1()},
 	name: String,
-    icon: String
+    icon: String,
 });
 
 
 
-const amenityDB = mongoose.model('amenity', amenitySchema)
+const amenityDB = mongoose.model('amenities', amenitySchema)
 
 module.exports = amenityDB;

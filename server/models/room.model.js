@@ -10,7 +10,8 @@ const roomSchema = new Schema({
 	description: String,
 	basePrice: Number,
 	maxOccupancy : {type: Number, default: 2},
-	addOns: [Object]
+	addOns: [Object],
+	amenities: [Object]
 });
 
 

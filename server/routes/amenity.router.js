@@ -5,7 +5,7 @@ const uuid = require('uuid');
 
 
 // Import DBs
-const amenityDd = require('../models/addOn.model');
+const amenityDd = require('../models/amenity.model');
 
 
 router.get('/', async(req,res) => {
@@ -36,6 +36,8 @@ router.post('/create', async(req,res) => {
 			name,
 			icon
 		})
+
+		console.log(req.body)
 		
 		res.sendStatus(200);
 

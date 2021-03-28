@@ -10,7 +10,6 @@ const bookingSchema = new Schema({
     checkIn: { default: null, type: Date },
 	checkOut: { default: null, type: Date },
 	numberOfNights: { default: null, type: Number },
-	listingsBooked: { default: null, type: [String] },
 	roomPrice: { default: null, type: Number },
 	addOnPrice: { default: null, type: Number },
 	totalPrice: { default: null, type: Number },

@@ -8,7 +8,6 @@ const uuid = require('uuid');
 // Import DBs
 const roomDB = require('../models/room.model');
 const addOnDb = require('../models/addOn.model');
-const listingDb = require('../models/listing.model');
 const bookingDb = require('../models/booking.model');
 
 
@@ -31,29 +30,6 @@ router.post('/create', async(req,res) => {
 			basePrice,
 			addOns,
 		});
-
-
-		// creating 6 months of listing documents for new room
-		const currentMoment = moment();
-		const endMoment = moment().add(6, 'months');
-
-		let newListings = [];
-
-		while (currentMoment.isBefore(endMoment, 'day')) {
-			
-			newListings.push({
-				uuid: uuid.v1(),
-				date: new Date(currentMoment),
-				roomUuid: newRoomUuid,
-				booked: false,
-				price: basePrice
-			});
-
-			currentMoment.add(1, 'days');
-		}
-
-
-		await listingDb.insertMany(newListings);
 		
 		res.sendStatus(200);
 
@@ -162,8 +138,6 @@ router.put('/update/:uuid', async(req,res) => {
 router.delete('/delete/:uuid', async(req,res) => {
     try {
 		const { uuid } = req.params;
-		
-		await listingDb.deleteMany({ roomUuid: uuid, booked: false });
 
 		await roomDB.deleteOne({ uuid });
 

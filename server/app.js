@@ -8,7 +8,6 @@ const cors = require('cors')
 require('dotenv').config();
 
 // scripts
-const createListings = require('./scripts/listings');
 
 
 // Body parser middleware
@@ -20,7 +19,6 @@ app.use(cors())
 
 
 // router imports
-const listingRouter = require('./routes/listing.router');
 const roomRouter = require('./routes/room.router');
 const addOnRouter = require('./routes/addOn.router');
 const bookingRouter = require('./routes/booking.router');
@@ -29,7 +27,6 @@ const amenityRouter = require('./routes/amenity.router');
 
 
 /* Routes */
-app.use('/api/listing', listingRouter);
 app.use('/api/room', roomRouter);
 app.use('/api/addon', addOnRouter);
 app.use('/api/booking', bookingRouter);
@@ -68,8 +65,6 @@ const dbConnect = async () => {
 /** Listen * */
 app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
-  
-  createListings.start();
 
   dbConnect();
 });
