@@ -3,7 +3,7 @@ const uuid = require('uuid');
 
 const { Schema } = mongoose;
 
-const roomSchema = new Schema({
+const roomTypeSchema = new Schema({
     uuid: { type: String, default: uuid.v1()},
     name: String,
     subtitle: String, 
@@ -11,11 +11,12 @@ const roomSchema = new Schema({
 	basePrice: Number,
 	maxOccupancy : {type: Number, default: 2},
 	addOns: [Object],
-	amenities: [Object]
+	amenities: [Object],
+	numberOfRooms: Number
 });
 
 
 
-const roomDB = mongoose.model('room', roomSchema)
+const roomTypeDb = mongoose.model('roomType', roomTypeSchema)
 
-module.exports = roomDB;
+module.exports = roomTypeDb;

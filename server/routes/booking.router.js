@@ -6,7 +6,8 @@ const uuid = require('uuid');
 
 
 // Import DBs
-const roomDB = require('../models/room.model');
+const roomTypeDb = require('../models/roomType.model');
+const roomsDb = require('../models/rooms.model');
 const addOnDb = require('../models/addOn.model');
 const bookingDb = require('../models/booking.model');
 
@@ -17,7 +18,7 @@ router.post('/create', async(req,res) => {
     try {
 
 		const { 
-			roomUuid,
+			roomTypeUuid,
 			addOns,
 			checkIn,
 			checkOut,
@@ -30,13 +31,22 @@ router.post('/create', async(req,res) => {
 			customerDetails
 		} = req.body;
 
-		console.log( req.body)
+		// console.log('create booking req.bidy', req.body)
+
+		// console.log('new Date(checkIn)', new Date(checkIn))
+
+		let room = await roomsDb.findOne({
+			roomTypeUuid,
+			status: 'Open'
+		});
+
+		
 
 		await bookingDb.create({
-			roomUuid,
+			roomTypeUuid,
 			addOns,
-			checkIn,
-			checkOut,
+			checkIn: new Date(checkIn),
+			checkOut: new Date(checkOut),
 			numberOfNights,
 			listingsBooked,
 			roomPrice,
@@ -44,7 +54,8 @@ router.post('/create', async(req,res) => {
 			totalPrice,
 			numberOfGuests,
 			customerDetails,
-			color: colors[Math.floor(Math.random() * colors.length - 1)]
+			color: colors[Math.floor(Math.random() * colors.length - 1)],
+			roomUuid: room.uuid
 		});
 		
 		res.sendStatus(200);
@@ -67,6 +78,14 @@ router.get('/', async (req, res) => {
 			},
 			{
 				$lookup : {
+					from: 'roomtypes',
+					localField: 'roomTypeUuid',
+					foreignField: 'uuid',
+					as: 'roomType'
+				}
+			},
+			{
+				$lookup : {
 					from: 'rooms',
 					localField: 'roomUuid',
 					foreignField: 'uuid',
@@ -74,6 +93,8 @@ router.get('/', async (req, res) => {
 				}
 			}
 		]);
+
+		// console.log('bookings',bookings)
 		
 		res.status(200).json({ bookings });
 
@@ -86,7 +107,7 @@ router.get('/', async (req, res) => {
 router.put('/update/:uuid', async(req,res) => {
     try {
 
-		console.log();
+		// console.log();
 		
 		res.sendStatus(200);
 

@@ -6,7 +6,8 @@ const uuid = require('uuid');
 
 
 // Import DBs
-const roomDB = require('../models/room.model');
+const roomsDb = require('../models/rooms.model');
+const roomTypeDb = require('../models/roomType.model');
 const addOnDb = require('../models/addOn.model');
 const bookingDb = require('../models/booking.model');
 const amenityDB = require('../models/amenity.model');
@@ -17,13 +18,14 @@ const amenityDB = require('../models/amenity.model');
 router.post('/create', async(req,res) => {
     try {
 
-		const { name, subtitle, description, addOns, basePrice, amenities } = req.body;
+		const { name, subtitle, description, addOns, basePrice, amenities, numberOfRooms } = req.body;
+
 
 		console.log('in create room');
 
 		const newRoomUuid = uuid.v1();
 		
-		await roomDB.create({
+		await roomTypeDb.create({
 			uuid: newRoomUuid,
 			name,
 			subtitle,
@@ -31,7 +33,24 @@ router.post('/create', async(req,res) => {
 			basePrice,
 			addOns,
 			amenities,
+			numberOfRooms
 		});
+
+		let rooms = [];
+
+
+		for (let i = 1; i <= numberOfRooms; i++) {
+
+			rooms.push({
+				uuid: uuid.v1(),
+				roomUuid: newRoomUuid,
+				roomNumber: i,
+				floor: 1,
+				status: 'Open'
+			})
+		}
+
+		await roomsDb.insertMany(rooms);
 		
 		res.sendStatus(200);
 
@@ -46,7 +65,7 @@ router.get('/', async(req,res) => {
 
 		console.log('in get rooms');
 		
-		const rooms = await roomDB.find({});
+		const rooms = await roomTypeDb.find({});
 
 		const addOns = await addOnDb.find({});
 
@@ -65,25 +84,30 @@ router.get('/', async(req,res) => {
 router.get('/listings', async (req, res) => { // returns all rooms that are not already booked between the checkin and out dates
     try {
 
+
+
 		const { checkIn, checkOut } = req.query;
 
 		console.log('in get listings');
 
-		const bookings = await bookingDb.aggregate([
+
+
+		let bookings = await bookingDb.aggregate([
 			{ 
 				$match: {
-					$or: [
+					$and: [
 						{
 							checkIn: {
-								$gte: new Date(checkIn) ,
 								$lt: new Date(checkOut) 
 							}
 						},
 						{
 							checkOut: {
-								$gte: new Date(checkIn) ,
-								$lt: new Date(checkOut) 
+								$gt: new Date(checkIn),
 							}
+						},
+						{
+							canceled: false
 						},
 					]
 				} 
@@ -95,20 +119,27 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 			}
 		]);
 
-		const rooms = await roomDB.find({});
+		// console.log('bookings',bookings);
+
+		// get a all the rooms that are not already booked, and return their roomtypes
+
+		let bookedRooms = bookings.map(booking => booking.roomUuid)
+
+		// console.log('bookedRooms',bookedRooms)
+
+		let roomTypeUuids = await roomsDb.distinct('roomTypeUuid', {
+			uuid : { $nin : bookedRooms }
+		})
+
+		// console.log('roomTypeUuids', roomTypeUuids)
 		
-		let listings = rooms.filter(room => {
-			for (booking of bookings) {
-				if (booking.roomUuid == room.uuid) {
-					return false;
-				}
-			}
-			return true;
+		const roomTypes = await roomTypeDb.find({ 
+			uuid: { $in: roomTypeUuids }
 		});
 
-		console.log(listings)
+		// console.log('roomTypes', roomTypes)
 
-		res.status(200).json(listings);
+		res.status(200).json(roomTypes);
 
     }catch(error) {
         console.log(error)
@@ -124,7 +155,7 @@ router.put('/update/:uuid', async(req,res) => {
 
 		console.log('in update room');
 		
-		await roomDB.update({ uuid },{
+		await roomTypeDb.update({ uuid },{
 			name,
 			subtitle,
 			description,
@@ -144,7 +175,14 @@ router.delete('/delete/:uuid', async(req,res) => {
     try {
 		const { uuid } = req.params;
 
-		await roomDB.deleteOne({ uuid });
+		const occupiedRoom = await roomsDb.find({ uuid, status: 'Occupied' })
+
+		if (occupiedRoom) {
+			res.status(400).json({ error: 'You cannot delete a room that is currently booked.'});
+		}
+
+		await roomTypeDb.deleteOne({ uuid });
+		await roomsDb.delete({ roomUuid: uuid });
 
 		res.sendStatus(200);
 
