@@ -107,7 +107,38 @@ router.get('/', async (req, res) => {
 router.put('/update/:uuid', async(req,res) => {
     try {
 
-		// console.log();
+		const {
+			customerDetails,
+			addOns,
+			roomUuid,
+			roomTypeUuid,
+			checkIn,
+			checkOut,
+			numberOfNights,
+			roomPrice,
+			addOnPrice,
+			totalPrice,
+			numberOfGuests
+		} = req.body;
+
+
+		const {
+			uuid
+		} = req.params;
+
+		await bookingDb.updateOne({ uuid },{
+			customerDetails,
+			addOns,
+			roomUuid,
+			roomTypeUuid,
+			checkIn,
+			checkOut,
+			numberOfNights,
+			roomPrice,
+			addOnPrice,
+			totalPrice,
+			numberOfGuests
+		})
 		
 		res.sendStatus(200);
 
