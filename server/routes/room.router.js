@@ -43,7 +43,7 @@ router.post('/create', async(req,res) => {
 
 			rooms.push({
 				uuid: uuid.v1(),
-				roomUuid: newRoomUuid,
+				roomTypeUuid: newRoomUuid,
 				roomNumber: i,
 				floor: 1,
 				status: 'Open'
@@ -86,60 +86,87 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 
 
 
-		const { checkIn, checkOut } = req.query;
+		const { checkIn, checkOut, bookingUuid } = req.query;
 
 		console.log('in get listings');
 
 
-
-		let bookings = await bookingDb.aggregate([
-			{ 
-				$match: {
-					$and: [
-						{
-							checkIn: {
-								$lt: new Date(checkOut) 
-							}
-						},
-						{
-							checkOut: {
-								$gt: new Date(checkIn),
-							}
-						},
-						{
-							canceled: false
-						},
-					]
-				} 
-			},
-			{
-				$project: {
-					roomUuid: 1
-				}
+		let aggr = [{ 
+			$match: {
+				$and: [
+					{
+						checkIn: {
+							$lt: new Date(checkOut) 
+						}
+					},
+					{
+						checkOut: {
+							$gt: new Date(checkIn),
+						}
+					},
+					{
+						canceled: false
+					},
+				]
+			} 
+		},
+		{
+			$project: {
+				roomUuid: 1
 			}
-		]);
+		}]
 
-		// console.log('bookings',bookings);
+
+
+		// need to exclude the current booking that is being updated from the booking query
+		if (bookingUuid) {
+			aggr[0]['$match']['$and'].push({
+				uuid: {
+					$nin: [ bookingUuid ]
+				}
+			})
+		}
+
+
+
+		let bookings = await bookingDb.aggregate(aggr);
+
+
+		let bookedRooms = bookings.map(booking => booking.roomUuid);
+
+		console.log('bookings',bookedRooms);
 
 		// get a all the rooms that are not already booked, and return their roomtypes
 
-		let bookedRooms = bookings.map(booking => booking.roomUuid)
 
-		// console.log('bookedRooms',bookedRooms)
-
-		let roomTypeUuids = await roomsDb.distinct('roomTypeUuid', {
+		let availableRooms = await roomsDb.find({
 			uuid : { $nin : bookedRooms }
 		})
 
-		// console.log('roomTypeUuids', roomTypeUuids)
+		console.log('availableRooms', availableRooms);
+
+		let roomTypeUuids = [];
+
+		for (const room of availableRooms) {
+			if (!roomTypeUuids.includes(room.roomTypeUuid)) {
+				roomTypeUuids.push(room.roomTypeUuid)
+			}
+		}
+
+
+		console.log('roomTypeUuids', roomTypeUuids)
 		
 		const roomTypes = await roomTypeDb.find({ 
 			uuid: { $in: roomTypeUuids }
 		});
 
-		// console.log('roomTypes', roomTypes)
+		console.log('roomTypes', roomTypes)
 
-		res.status(200).json(roomTypes);
+		if (bookingUuid) {
+			res.status(200).json({roomTypes, rooms: availableRooms});
+		} else {
+			res.status(200).json(roomTypes);
+		}
 
     }catch(error) {
         console.log(error)
@@ -175,14 +202,14 @@ router.delete('/delete/:uuid', async(req,res) => {
     try {
 		const { uuid } = req.params;
 
-		const occupiedRoom = await roomsDb.find({ uuid, status: 'Occupied' })
+		const occupiedRoom = await roomsDb.find({ roomTypeUuid: uuid, status: 'Occupied' })
 
-		if (occupiedRoom) {
+		if (occupiedRoom[0]) {
 			res.status(400).json({ error: 'You cannot delete a room that is currently booked.'});
 		}
 
 		await roomTypeDb.deleteOne({ uuid });
-		await roomsDb.delete({ roomUuid: uuid });
+		await roomsDb.deleteMany({ roomTypeUuid: uuid });
 
 		res.sendStatus(200);
 
