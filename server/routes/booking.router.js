@@ -28,7 +28,8 @@ router.post('/create', async(req,res) => {
 			addOnPrice,
 			totalPrice,
 			numberOfGuests,
-			customerDetails
+			customerDetails,
+			companyUuid
 		} = req.body;
 
 		// console.log('create booking req.bidy', req.body)
@@ -44,6 +45,7 @@ router.post('/create', async(req,res) => {
 
 		await bookingDb.create({
 			roomTypeUuid,
+			companyUuid,
 			addOns,
 			checkIn: new Date(checkIn),
 			checkOut: new Date(checkOut),
@@ -68,12 +70,17 @@ router.post('/create', async(req,res) => {
 
 
 
-router.get('/', async (req, res) => {
+router.get('/:companyUuid', async (req, res) => {
     try {
+
+		const { companyUuid } = req.params;
+
+
 		const bookings = await bookingDb.aggregate([
 			{
 				$match: {
-					canceled: false
+					canceled: false,
+					companyUuid: companyUuid
 				}
 			},
 			{

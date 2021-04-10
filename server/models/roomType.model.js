@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 
 const roomTypeSchema = new Schema({
     uuid: { type: String, default: uuid.v1()},
+	companyUuid: { default: null, type: String },
     name: String,
     subtitle: String, 
 	description: String,

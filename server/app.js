@@ -23,6 +23,8 @@ const roomRouter = require('./routes/room.router');
 const addOnRouter = require('./routes/addOn.router');
 const bookingRouter = require('./routes/booking.router');
 const amenityRouter = require('./routes/amenity.router');
+const userRouter = require('./routes/user.router');
+const companyRouter = require('./routes/company.router');
 
 
 
@@ -31,6 +33,8 @@ app.use('/api/room', roomRouter);
 app.use('/api/addon', addOnRouter);
 app.use('/api/booking', bookingRouter);
 app.use('/api/amenity', amenityRouter);
+app.use('/api/user', userRouter);
+app.use('/api/company', companyRouter);
 
 app.get('/public',(req,res) => {
 	res.sendStatus(200);

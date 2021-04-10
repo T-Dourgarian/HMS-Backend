@@ -18,7 +18,7 @@ const amenityDB = require('../models/amenity.model');
 router.post('/create', async(req,res) => {
     try {
 
-		const { name, subtitle, description, addOns, basePrice, amenities, numberOfRooms } = req.body;
+		const { name, subtitle, description, addOns, basePrice, amenities, numberOfRooms, companyUuid } = req.body;
 
 
 		console.log('in create room');
@@ -27,6 +27,7 @@ router.post('/create', async(req,res) => {
 		
 		await roomTypeDb.create({
 			uuid: newRoomUuid,
+			companyUuid,
 			name,
 			subtitle,
 			description,
@@ -44,6 +45,7 @@ router.post('/create', async(req,res) => {
 			rooms.push({
 				uuid: uuid.v1(),
 				roomTypeUuid: newRoomUuid,
+				companyUuid,
 				roomNumber: i,
 				floor: 1,
 				status: 'Open'
@@ -60,25 +62,6 @@ router.post('/create', async(req,res) => {
     }
 });
 
-router.get('/', async(req,res) => {
-    try {
-
-		console.log('in get rooms');
-		
-		const rooms = await roomTypeDb.find({});
-
-		const addOns = await addOnDb.find({});
-
-		const amenities = await amenityDB.find({});
-
-		
-		res.status(200).json({ rooms, addOns, amenities });
-
-    }catch(error) {
-        console.log(error)
-        res.sendStatus(400);
-    }
-});
 
 
 router.get('/listings', async (req, res) => { // returns all rooms that are not already booked between the checkin and out dates
@@ -86,9 +69,9 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 
 
 
-		const { checkIn, checkOut, bookingUuid } = req.query;
+		const { checkIn, checkOut, bookingUuid, companyUuid } = req.query;
 
-		console.log('in get listings');
+		console.log('in get listings',companyUuid);
 
 
 		let aggr = [{ 
@@ -105,7 +88,8 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 						}
 					},
 					{
-						canceled: false
+						canceled: false,
+						companyUuid: companyUuid
 					},
 				]
 			} 
@@ -131,19 +115,22 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 
 		let bookings = await bookingDb.aggregate(aggr);
 
+		console.log('bookings',bookings)
+
 
 		let bookedRooms = bookings.map(booking => booking.roomUuid);
 
-		console.log('bookings',bookedRooms);
+		// console.log('bookings',bookedRooms);
 
 		// get a all the rooms that are not already booked, and return their roomtypes
 
 
 		let availableRooms = await roomsDb.find({
-			uuid : { $nin : bookedRooms }
+			uuid : { $nin : bookedRooms },
+			companyUuid
 		})
 
-		console.log('availableRooms', availableRooms);
+		// console.log('availableRooms', availableRooms);
 
 		let roomTypeUuids = [];
 
@@ -154,19 +141,47 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 		}
 
 
-		console.log('roomTypeUuids', roomTypeUuids)
+		// console.log('roomTypeUuids', roomTypeUuids)
 		
 		const roomTypes = await roomTypeDb.find({ 
 			uuid: { $in: roomTypeUuids }
 		});
 
-		console.log('roomTypes', roomTypes)
+		// console.log('roomTypes', roomTypes)
 
 		if (bookingUuid) {
 			res.status(200).json({roomTypes, rooms: availableRooms});
 		} else {
 			res.status(200).json(roomTypes);
 		}
+
+    }catch(error) {
+        console.log(error)
+        res.sendStatus(400);
+    }
+});
+
+router.get('/:companyUuid', async(req,res) => {
+    try {
+
+		const { companyUuid } = req.params;
+
+		console.log('in get rooms');
+		
+		const rooms = await roomTypeDb.find({
+			companyUuid
+		});
+
+		const addOns = await addOnDb.find({
+			companyUuid
+		});
+
+		const amenities = await amenityDB.find({
+			companyUuid
+		});
+
+		
+		res.status(200).json({ rooms, addOns, amenities });
 
     }catch(error) {
         console.log(error)

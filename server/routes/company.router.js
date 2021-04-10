@@ -5,7 +5,7 @@ const uuid = require('uuid');
 
 
 // Import DBs
-const addOnDb = require('../models/addOn.model');
+const companyDB = require('../models/company.model');
 
 
 
@@ -13,15 +13,13 @@ const addOnDb = require('../models/addOn.model');
 router.post('/create', async(req,res) => {
     try {
 
-		const { name, cost, companyUuid } = req.body;
+		const { name } = req.body;
 
-		console.log('in create room');
+		console.log('in create company');
 		
-		await addOnDb.create({
+		await companyDB.create({
 			uuid: uuid.v1(),
-			companyUuid,
-			name,
-			cost,
+			name
 		});
 		
 		res.sendStatus(200);
@@ -32,17 +30,30 @@ router.post('/create', async(req,res) => {
     }
 });
 
-router.get('/all', async(req,res) => {
+router.get('/:companyName', async(req,res) => {
     try {
-		
-		const addOns = await addOnDb.find({});
 
-		res.status(200).json(addOns);
+		const { companyName } = req.params;
+
+		console.log('in get company');
+		
+		const company = await companyDB.findOne({
+			name: companyName
+		});
+
+		if(company) {
+			res.status(200).json(company);
+		} else {
+			res.sendStatus(400);
+		}
+		
 
     }catch(error) {
         console.log(error)
         res.sendStatus(400);
     }
 });
+
+
 
 module.exports = router;

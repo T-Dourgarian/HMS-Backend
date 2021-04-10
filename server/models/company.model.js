@@ -3,15 +3,13 @@ const uuid = require('uuid');
 
 const { Schema } = mongoose;
 
-const addOnSchema = new Schema({
+const companySchema = new Schema({
 	uuid: { type: String, default: uuid.v1()},
 	name: String,
-    cost: Number,
-	companyUuid: String
 });
 
 
 
-const addOnDb = mongoose.model('addOn', addOnSchema)
+const companyDB = mongoose.model('companies', companySchema)
 
-module.exports = addOnDb;
+module.exports = companyDB;

@@ -4,7 +4,8 @@ const uuid = require('uuid');
 const { Schema } = mongoose;
 
 const bookingSchema = new Schema({
-	uuid: { type: String, default: uuid.v1() },
+	uuid: { default: null, type: String },
+	companyUuid: { default: null, type: String },
 	addOns: { default: [], type: Array },
 	roomUuid: { default: null, type: String },
 	roomTypeUuid: { default: null, type: String },

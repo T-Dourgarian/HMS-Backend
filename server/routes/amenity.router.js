@@ -28,11 +28,13 @@ router.post('/create', async(req,res) => {
 		const {
 			name,
 			icon,
+			companyUuid
 		} = req.body;
 
 
 		await amenityDd.create({
 			uuid: uuid.v1(),
+			companyUuid,
 			name,
 			icon
 		})
