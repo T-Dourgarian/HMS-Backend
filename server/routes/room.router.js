@@ -127,7 +127,8 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 
 		let availableRooms = await roomsDb.find({
 			uuid : { $nin : bookedRooms },
-			companyUuid
+			companyUuid,
+			active: true
 		})
 
 		// console.log('availableRooms', availableRooms);
@@ -168,9 +169,22 @@ router.get('/:companyUuid', async(req,res) => {
 
 		console.log('in get rooms');
 		
-		const rooms = await roomTypeDb.find({
-			companyUuid
-		});
+		const rooms = await roomTypeDb.aggregate([
+			{
+				$match: {
+					companyUuid,
+					active: true
+				}
+			},
+			{
+				$lookup : {
+					from: 'images',
+					localField: 'uuid',
+					foreignField: 'roomTypeUuid',
+					as: 'images'
+				}
+			}
+		]);
 
 		const addOns = await addOnDb.find({
 			companyUuid
@@ -197,7 +211,7 @@ router.put('/update/:uuid', async(req,res) => {
 
 		console.log('in update room');
 		
-		await roomTypeDb.update({ uuid },{
+		await roomTypeDb.updateOne({ uuid },{
 			name,
 			subtitle,
 			description,
@@ -223,8 +237,8 @@ router.delete('/delete/:uuid', async(req,res) => {
 			res.status(400).json({ error: 'You cannot delete a room that is currently booked.'});
 		}
 
-		await roomTypeDb.deleteOne({ uuid });
-		await roomsDb.deleteMany({ roomTypeUuid: uuid });
+		await roomTypeDb.updateOne({ uuid }, { active: false });
+		await roomsDb.updateMany({ roomTypeUuid: uuid }, { active: false });
 
 		res.sendStatus(200);
 

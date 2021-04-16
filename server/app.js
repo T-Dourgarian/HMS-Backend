@@ -25,6 +25,7 @@ const bookingRouter = require('./routes/booking.router');
 const amenityRouter = require('./routes/amenity.router');
 const userRouter = require('./routes/user.router');
 const companyRouter = require('./routes/company.router');
+const imageRouter = require('./routes/image.router');
 
 
 
@@ -35,10 +36,21 @@ app.use('/api/booking', bookingRouter);
 app.use('/api/amenity', amenityRouter);
 app.use('/api/user', userRouter);
 app.use('/api/company', companyRouter);
+app.use('/api/image', imageRouter)
 
 app.get('/public',(req,res) => {
 	res.sendStatus(200);
 })
+// const roomtypedb = require('./models/roomType.model')
+// const roomdb= require('./models/rooms.model')
+
+
+// async function update() {
+// 	await roomtypedb.updateMany({}, {active: true})
+// 	await roomdb.updateMany({}, {active: true})
+// }
+
+
 
 // Serve static files
 app.use(express.static('build'));

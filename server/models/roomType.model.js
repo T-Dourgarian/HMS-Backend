@@ -13,7 +13,8 @@ const roomTypeSchema = new Schema({
 	maxOccupancy : {type: Number, default: 2},
 	addOns: [Object],
 	amenities: [Object],
-	numberOfRooms: Number
+	numberOfRooms: Number,
+	active: { default: true, type: Boolean }
 });
 
 

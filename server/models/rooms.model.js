@@ -9,7 +9,8 @@ const roomsSchema = new Schema({
 	roomTypeUuid: String,
     roomNumber: String,
 	floor: Number,
-	status: { type: String, enum: ['Open', 'Occupied'] }
+	status: { type: String, enum: ['Open', 'Occupied'] },
+	active: { default: true, type: Boolean }
 });
 
 
