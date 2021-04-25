@@ -10,6 +10,7 @@ const roomTypeDb = require('../models/roomType.model');
 const roomsDb = require('../models/rooms.model');
 const addOnDb = require('../models/addOn.model');
 const bookingDb = require('../models/booking.model');
+const { checkout } = require('./room.router');
 
 // colors for calendar bookings
 const colors = ['#407294','#5ac18e','#008080','#ffa500','#ff7373','#fa8072','#20b2aa','#468499','#6897bb','#66cdaa']
@@ -17,7 +18,7 @@ const colors = ['#407294','#5ac18e','#008080','#ffa500','#ff7373','#fa8072','#20
 router.post('/create', async(req,res) => {
     try {
 
-		const { 
+		let { 
 			roomTypeUuid,
 			addOns,
 			checkIn,
@@ -32,23 +33,52 @@ router.post('/create', async(req,res) => {
 			companyUuid
 		} = req.body;
 
-		// console.log('create booking req.bidy', req.body)
 
-		// console.log('new Date(checkIn)', new Date(checkIn))
+		let aggr = [{ // make sure the room that we assign to booking has not already been booked
+			$match: {
+				$and: [
+					{
+						checkIn: {
+							$lt: new Date(checkOut) 
+						}
+					},
+					{
+						checkOut: {
+							$gt: new Date(checkIn),
+						}
+					},
+					{
+						canceled: false,
+						companyUuid: companyUuid,
+						roomTypeUuid: roomTypeUuid
+					}
+				]
+			} 
+		},
+		{
+			$project: {
+				roomUuid: 1
+			}
+		}]
+
+		let bookings = await bookingDb.aggregate(aggr); // get all bookings between these dates
+
+		let bookedRooms = bookings.map(booking => booking.roomUuid);
 
 		let room = await roomsDb.findOne({
 			roomTypeUuid,
-			status: 'Open'
+			uuid: {
+				$nin: bookedRooms
+			}
 		});
 
-		
-
 		await bookingDb.create({
+			uuid: uuid.v1(),
 			roomTypeUuid,
 			companyUuid,
 			addOns,
-			checkIn: new Date(checkIn),
-			checkOut: new Date(checkOut),
+			checkIn,
+			checkOut,
 			numberOfNights,
 			listingsBooked,
 			roomPrice,
@@ -75,12 +105,34 @@ router.get('/:companyUuid', async (req, res) => {
 
 		const { companyUuid } = req.params;
 
+		const { today } = req.query;
+
+		let d = new Date()
+
+		console.log(d)
+
+		let date = d.getMonth() + 1 + '-' + d.getDate() + '-' + d.getFullYear()
+
+		let todayMatch = {};
+
+		if (today) {
+			todayMatch = {
+				checkOut: {
+					$gte: new Date(date)
+				},
+				checkIn: {
+					$lte: new Date(date)
+				}
+			}
+		}
+
 
 		const bookings = await bookingDb.aggregate([
 			{
 				$match: {
 					canceled: false,
-					companyUuid: companyUuid
+					companyUuid: companyUuid,
+					...todayMatch
 				}
 			},
 			{
@@ -158,6 +210,9 @@ router.put('/update/:uuid', async(req,res) => {
 router.delete('/cancel/:uuid', async(req,res) => {
     try {
 		const { uuid } = req.params;
+
+		console.log(uuid)
+
 
 		await bookingDb.updateOne({ uuid: uuid }, { canceled: true })
 
