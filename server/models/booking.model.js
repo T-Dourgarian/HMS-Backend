@@ -22,7 +22,11 @@ const bookingSchema = new Schema({
 		phoneNumber: { default: null, type: String },
 	},
 	color: { default: '#FF5733', type: String},
-	canceled: {default: false, type: Boolean }
+	canceled: {default: false, type: Boolean },
+	checkedIn: {default: false, type: Boolean },
+	checkedInDate: {default: null, type: String },
+	checkedOut: {default: false, type: Boolean },
+	checkedOutDate: {default: null, type: String },
 });
 
 

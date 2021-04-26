@@ -41,13 +41,19 @@ app.use('/api/image', imageRouter)
 app.get('/public',(req,res) => {
 	res.sendStatus(200);
 })
+
+
 // const roomtypedb = require('./models/roomType.model')
 // const roomdb= require('./models/rooms.model')
+// const bookingdb = require('./models/booking.model');
 
 
 // async function update() {
-// 	await roomtypedb.updateMany({}, {active: true})
-// 	await roomdb.updateMany({}, {active: true})
+	// await roomtypedb.updateMany({}, {active: true})
+	// await roomdb.updateMany({}, {active: true})
+
+	// await bookingdb.updateMany({}, {checkedIn: false, checkedOut: false})
+
 // }
 
 

@@ -224,4 +224,41 @@ router.delete('/cancel/:uuid', async(req,res) => {
 });
 
 
+
+router.put('/checkInOut/:uuid', async(req,res) => {
+    try {
+
+		const {
+			uuid
+		} = req.params;
+
+		const {
+			date,
+		} = req.body;
+
+
+
+		const booking = await bookingDb.findOne({ uuid });
+
+
+		let updateProperties = ['checkedIn', 'checkedInDate']
+
+		if (booking.checkedIn) {
+			updateProperties = ['checkedOut','checkedOutDate']
+		}
+
+		await bookingDb.updateOne({ uuid },{
+			[updateProperties[0]]: true,
+			[updateProperties[1]]: date,
+		});
+		
+		res.sendStatus(200);
+
+    }catch(error) {
+        console.log(error)
+        res.sendStatus(400);
+    }
+});
+
+
 module.exports = router;
