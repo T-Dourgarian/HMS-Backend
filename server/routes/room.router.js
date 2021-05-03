@@ -144,9 +144,21 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 
 		// console.log('roomTypeUuids', roomTypeUuids)
 		
-		const roomTypes = await roomTypeDb.find({ 
-			uuid: { $in: roomTypeUuids }
-		});
+		const roomTypes = await roomTypeDb.aggregate([
+			{ 
+				$match: {
+					uuid: { $in: roomTypeUuids }
+				}
+			},
+			{
+				$lookup : {
+					from: 'images',
+					localField: 'uuid',
+					foreignField: 'roomTypeUuid',
+					as: 'images'
+				}
+			}
+		]);
 
 		// console.log('roomTypes', roomTypes)
 
