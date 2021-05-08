@@ -13,12 +13,13 @@ const addOnDb = require('../models/addOn.model');
 router.post('/create', async(req,res) => {
     try {
 
-		const { name, cost, companyUuid } = req.body;
+		const { name, cost, description, companyUuid } = req.body;
 
-		console.log('in create room');
+		console.log('in create addOn');
 		
 		await addOnDb.create({
 			uuid: uuid.v1(),
+			description,
 			companyUuid,
 			name,
 			cost,

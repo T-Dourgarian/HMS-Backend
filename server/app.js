@@ -46,6 +46,7 @@ app.get('/public',(req,res) => {
 // const roomtypedb = require('./models/roomType.model')
 // const roomdb= require('./models/rooms.model')
 // const bookingdb = require('./models/booking.model');
+const addOndb = require('./models/addOn.model');
 
 
 // async function update() {
@@ -53,6 +54,9 @@ app.get('/public',(req,res) => {
 	// await roomdb.updateMany({}, {active: true})
 
 	// await bookingdb.updateMany({}, {checkedIn: false, checkedOut: false})
+
+
+// 	await addOndb.updateMany({}, { description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore'})
 
 // }
 

@@ -6,6 +6,7 @@ const { Schema } = mongoose;
 const addOnSchema = new Schema({
 	uuid: { type: String, default: uuid.v1()},
 	name: String,
+	description: String,
     cost: Number,
 	companyUuid: String
 });
