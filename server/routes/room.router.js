@@ -69,7 +69,7 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 
 
 
-		const { checkIn, checkOut, bookingUuid, companyUuid } = req.query;
+		const { checkIn, checkOut, numOfGuests, companyUuid,  bookingUuid } = req.query;
 
 		console.log('in get listings',companyUuid);
 
@@ -142,11 +142,12 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 		}
 
 
-		// console.log('roomTypeUuids', roomTypeUuids)
+		// console.log('roomTypeUuids', numOfGuests)
 		
 		const roomTypes = await roomTypeDb.aggregate([
 			{ 
 				$match: {
+					maxOccupancy: { $gte: Number(numOfGuests)},
 					uuid: { $in: roomTypeUuids }
 				}
 			},
@@ -160,7 +161,7 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 			}
 		]);
 
-		// console.log('roomTypes', roomTypes)
+		console.log('roomTypes', roomTypes)
 
 		if (bookingUuid) {
 			res.status(200).json({roomTypes, rooms: availableRooms});
