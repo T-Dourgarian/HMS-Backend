@@ -21,7 +21,31 @@ const storage = multer.memoryStorage({
 
 const upload = multer({storage}).single('image');
 
+router.delete('/delete/:uuid', upload, (req,res) => {
+	console.log('in image delete');
 
+	const { uuid } = req.params;
+
+
+    const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: uuid,
+    };
+
+	console.log('Params', params)
+
+    s3.deleteObject(params, async (error, data) => {
+        if(error){
+            res.status(500).json(error)
+        }
+
+		await imageDB.deleteOne({
+			uuid
+		});
+
+        res.status(200).json(data)
+    });
+})
 
 router.post('/upload', upload, (req, res) => {
   try {

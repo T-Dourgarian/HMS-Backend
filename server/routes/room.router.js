@@ -71,7 +71,7 @@ router.get('/listings', async (req, res) => { // returns all rooms that are not 
 
 		const { checkIn, checkOut, numOfGuests, companyUuid,  bookingUuid } = req.query;
 
-		console.log('in get listings',companyUuid);
+		console.log('in get listings',checkIn, checkOut, numOfGuests, companyUuid,  bookingUuid );
 
 
 		let aggr = [{ 

@@ -46,7 +46,7 @@ app.get('/public',(req,res) => {
 // const roomtypedb = require('./models/roomType.model')
 // const roomdb= require('./models/rooms.model')
 // const bookingdb = require('./models/booking.model');
-const addOndb = require('./models/addOn.model');
+// const addOndb = require('./models/addOn.model');
 
 
 // async function update() {
