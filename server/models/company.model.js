@@ -6,7 +6,7 @@ const { Schema } = mongoose;
 const companySchema = new Schema({
 	uuid: { type: String, default: uuid.v1()},
 	name: String,
-});
+}, { timestamps: true });
 
 
 

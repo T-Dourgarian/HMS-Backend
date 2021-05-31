@@ -26,6 +26,7 @@ const amenityRouter = require('./routes/amenity.router');
 const userRouter = require('./routes/user.router');
 const companyRouter = require('./routes/company.router');
 const imageRouter = require('./routes/image.router');
+const expenseRouter = require('./routes/expense.router');
 
 
 
@@ -37,6 +38,7 @@ app.use('/api/amenity', amenityRouter);
 app.use('/api/user', userRouter);
 app.use('/api/company', companyRouter);
 app.use('/api/image', imageRouter)
+app.use('/api/expense', expenseRouter)
 
 app.get('/public',(req,res) => {
 	res.sendStatus(200);

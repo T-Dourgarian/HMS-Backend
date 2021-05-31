@@ -15,7 +15,7 @@ const roomTypeSchema = new Schema({
 	amenities: [Object],
 	numberOfRooms: Number,
 	active: { default: true, type: Boolean }
-});
+}, { timestamps: true });
 
 
 

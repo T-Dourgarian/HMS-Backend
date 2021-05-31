@@ -8,7 +8,7 @@ const userSchema = new Schema({
 	companyUuid: { default: null, type: String },
 	username: String,
 	password: String
-});
+}, { timestamps: true });
 
 
 

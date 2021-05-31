@@ -9,7 +9,7 @@ const addOnSchema = new Schema({
 	description: String,
     cost: Number,
 	companyUuid: String
-});
+}, { timestamps: true });
 
 
 

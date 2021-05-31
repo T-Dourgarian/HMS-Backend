@@ -8,7 +8,7 @@ const amenitySchema = new Schema({
 	name: String,
     icon: String,
 	companyUuid: String
-});
+}, { timestamps: true });
 
 
 

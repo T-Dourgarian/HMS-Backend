@@ -11,7 +11,7 @@ const roomsSchema = new Schema({
 	floor: Number,
 	status: { type: String, enum: ['Open', 'Occupied'] },
 	active: { default: true, type: Boolean }
-});
+}, { timestamps: true });
 
 
 

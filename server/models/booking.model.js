@@ -43,7 +43,7 @@ const bookingSchema = new Schema({
 	checkedInDate: {default: null, type: String },
 	checkedOut: {default: false, type: Boolean },
 	checkedOutDate: {default: null, type: String },
-});
+}, { timestamps: true });
 
 
 

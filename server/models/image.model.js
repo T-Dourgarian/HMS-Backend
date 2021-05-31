@@ -8,7 +8,7 @@ const imageSchema = new Schema({
 	name: String,
 	roomTypeUuid: String,
 	path: String
-});
+}, { timestamps: true });
 
 
 
